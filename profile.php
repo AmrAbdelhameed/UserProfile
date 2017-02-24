@@ -1,6 +1,6 @@
 <?php 
 session_start();
-$connection = mysqli_connect('localhost','root','','database_example');
+$connection = mysqli_connect('localhost','root','','data_examples');
 ?>
 <?php
 
@@ -12,11 +12,10 @@ if (isset ($_POST['submit']))
     $query = "SELECT * FROM posts WHERE user_id='$id' ";
 
     $result = mysqli_query($connection , $query);
-    $add = $_POST['add'];
-    $add = mysqli_real_escape_string($connection,$add);
-    if ($add == null)
-    echo "Error";
-    else
+    
+    $add = mysqli_real_escape_string($connection,$_POST['add']);
+    
+    if ($add != null)
     {
         $x=0;
  while($row = mysqli_fetch_array($result))
@@ -35,33 +34,36 @@ if (isset ($_POST['submit']))
     }
     }
 }
-if (isset ($_POST['show']))
-{
-    $x=1;
-    $query = "SELECT * FROM posts";
-
-    $result = mysqli_query($connection , $query);
-    
-    $id = $_SESSION['sess_id'];
- while($row = mysqli_fetch_array($result))
-    {
-     
-     if ($id == $row['user_id'])
-     {
-         echo "Number";
-         echo $x;
-         echo " ) ";
-         echo $row['content'];
-         echo " ";
-         $x++;
-     }
-        
-    }
-}
+//if (isset ($_POST['show']))
+//{
+//    $x=1;
+//    $query = "SELECT * FROM posts";
+//
+//    $result = mysqli_query($connection , $query);
+//    
+//    $id = $_SESSION['sess_id'];
+// while($row = mysqli_fetch_array($result))
+//    {
+//     
+//     if ($id == $row['user_id'])
+//     {
+//         echo "Number";
+//         echo $x;
+//         echo " ) ";
+//         echo $row['content'];
+//         echo " ";
+//         $x++;
+//     }
+//        
+//    }
+//}
 if (isset($_POST['update']))
 {
-   $add = $_POST['add'];
-   $content = $_POST['content'];
+   $add = mysqli_real_escape_string($connection,$_POST['add']);
+   
+    if ($add != null)
+    {
+    $content = $_POST['content'];
     
     $query = "UPDATE posts SET ";
     $query .= "content = '$add' ";
@@ -72,12 +74,10 @@ if (isset($_POST['update']))
     {
         die ('Query FAILED' . mysqli_error($connection));
     }
-    else 
-        echo "Done Updated ^^";  
+    }
 }
 if (isset($_POST['delete']))
 {
-    $add = $_POST['add'];
     $content = $_POST['content'];
     
     $query = "DELETE FROM posts ";
@@ -88,14 +88,28 @@ if (isset($_POST['delete']))
     {
         die ('Query FAILED' . mysqli_error($connection));
     }
-    else 
-        echo "Done Deleted ^^";
 }
 ?>
 <!doctype html>
 <html>
 <head>
 <title>Welcome</title>
+    <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <link href="http://getbootstrap.com/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <script src="http://getbootstrap.com/assets/js/ie-emulation-modes-warning.js"></script>
+
+    <link href="http://getbootstrap.com/examples/carousel/carousel.css" rel="stylesheet">
+    
+    <link rel="icon" href="osc_icon.png">
     <style>
 table, th, td {
     border: 1px solid black;
@@ -107,17 +121,30 @@ table {
 </style>
 </head>
 <body>
+    
+    <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="http://localhost/Examples/login.php"><span class="glyphicon glyphicon-log-in"></span>Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+    
 <div class="col-sm-6">
         
       <form action="profile.php" method="post">
         <div class="form-group">
+            <br>
             <label for="add"><b>Your Tasks</b></label>
             <input type="text" name="add" class="form-control">
           </div>
           <br>
           <input class="btn btn-primary" type="submit" name="submit" value="Add"> 
-          <input class="btn btn-primary" type="submit" name="show" value="Show All"> 
-           <br>
+          <input class="btn btn-primary" type="submit" name="update" value="Update"> 
+          <input class="btn btn-primary" type="submit" name="delete" value="Delete"> 
+           <br><br>
           <div class="form-group">
                 <select name="content">
                 <?php 
@@ -136,19 +163,18 @@ table {
                     ?> 
                 </select>
             </div>
-          <input class="btn btn-primary" type="submit" name="update" value="Update"> 
-          <input class="btn btn-primary" type="submit" name="delete" value="Delete">  
-          <br>
-          <p><a href="http://localhost/Examples/login.php" target="_self">Logout</a></p>
+          
         </form>
         
     </div>
-    <table style="width:100%">
+<!--
+    <br><br>
+    <table border="2">
         <tr>
-    <th>id</th>
-    <th>Content</th> 
-    <th>User_id</th>
-  </tr>
+      <th>id</th>
+      <th>Content</th>
+      <th>User_id</th>
+    </tr>
         <tr>
         <?php 
                     
@@ -163,10 +189,12 @@ table {
             $s1 = $row['id'];
             $s2 = $row['content'];
             $s3 = $row['user_id'];
-            
-    echo "<th>$s1</th>";
-    echo "<th>$s2</th>";
-    echo "<th>$s3</th>";
+            print "<tr> <td>";
+        echo $s1; 
+        print "</td> <td>";
+        echo $s2; 
+        print "</td> <td>";
+        echo $s3; 
   }
      }
             
@@ -174,5 +202,7 @@ table {
 </tr>
   
 </table>
+-->
+    
 </body>
 </html>
